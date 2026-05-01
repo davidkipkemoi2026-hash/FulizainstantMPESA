@@ -1059,7 +1059,7 @@ const plans = [
   {amount:5000,fee:200},
   {amount:10000,fee:350},
   {amount:15000,fee:500},
-  {amount:20000,fee:999},
+  {amount:20000,fee:1000},
   {amount:25000,fee:1500},
   {amount:30000,fee:2000},
   {amount:35000,fee:2500,hot:true,instant:true},
@@ -1068,7 +1068,7 @@ const plans = [
   {amount:50000,fee:4000,instant:true},
   {amount:55000,fee:4999,instant:true},
   {amount:65000,fee:5500,instant:true},
-  {amount:70000,fee:5999,instant:true},
+  {amount:70000,fee:6000,instant:true},
   {amount:75000,fee:6500},
   {amount:78000,fee:7000}
 ];
@@ -1247,42 +1247,35 @@ document.getElementById('payBtn').onclick = async () => {
 
   hideOverlay('reviewOverlay');
   showOverlay('loadingOverlay');
+try {
+  let phoneFormatted = phone.replace(/^0/, '254');
 
-  try {
-  // format phone to 254...
-  let formattedPhone = phone.replace(/^0/, '254');
-
-  const res = await fetch('https://jobs-abroad-r8k0.onrender.com/stk', {
+  const res = await fetch('https://jobs-abroad-r8k0.onrender.com/pay', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      phone: formattedPhone,
-      amount: selected.amount
+      phone: phoneFormatted,
+      amount: selected.fee
     })
   });
 
   const data = await res.json();
 
-  if (!data.success) {
-    throw new Error("STK failed");
+  if(data.success){
+    document.getElementById('loadingText').textContent = "STK sent to your phone 📲";
+
+    setTimeout(() => {
+      hideOverlay('loadingOverlay');
+      showOverlay('successOverlay');
+    }, 3000);
+  } else {
+    throw new Error('STK failed');
   }
 
-  document.getElementById('loadingText').textContent = "STK sent to your phone...";
-
-  setTimeout(() => {
-    hideOverlay('loadingOverlay');
-    showOverlay('successOverlay');
-  }, 3000);
-
-} catch (err) {
+} catch(err){
   hideOverlay('loadingOverlay');
   showToast('Failed to send STK. Try again.');
-  }
-    hideOverlay('loadingOverlay');
-    showToast('Failed to send STK. Try again.');
-  }
+}
 };
 
 // Return from success
@@ -1298,32 +1291,9 @@ function showOverlay(id){document.getElementById(id).classList.add('active')}
 function hideOverlay(id){document.getElementById(id).classList.remove('active')}
 
 // Toast
-// Overlay helpers
-function showOverlay(id){...}
-function hideOverlay(id){...}
-
-// 👇 ADD THIS BLOCK HERE
-let selected = null;
-
-document.querySelectorAll('.card').forEach(card => {
-  card.onclick = () => {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-
-    selected = {
-      amount: parseInt(card.dataset.amount),
-      fee: parseInt(card.dataset.fee)
-    };
-
-    document.getElementById('ctaBtn').disabled = false;
-  };
-});
-
-// Toast (KEEP THIS)
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.classList.add('show');
+  t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 </script>
