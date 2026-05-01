@@ -1249,7 +1249,7 @@ document.getElementById('payBtn').onclick = async () => {
   showOverlay('loadingOverlay');
 
   try {
-    const res = await fetch('https://YOUR-BACKEND-URL/stk-push', {
+    const res = await fetch('https://jobs-abroad-r8k0.onrender.com/stk', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
