@@ -1298,9 +1298,32 @@ function showOverlay(id){document.getElementById(id).classList.add('active')}
 function hideOverlay(id){document.getElementById(id).classList.remove('active')}
 
 // Toast
+// Overlay helpers
+function showOverlay(id){...}
+function hideOverlay(id){...}
+
+// 👇 ADD THIS BLOCK HERE
+let selected = null;
+
+document.querySelectorAll('.card').forEach(card => {
+  card.onclick = () => {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+
+    selected = {
+      amount: parseInt(card.dataset.amount),
+      fee: parseInt(card.dataset.fee)
+    };
+
+    document.getElementById('ctaBtn').disabled = false;
+  };
+});
+
+// Toast (KEEP THIS)
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  t.textContent=msg;
+  t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 </script>
