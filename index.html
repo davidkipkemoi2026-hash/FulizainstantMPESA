@@ -1249,30 +1249,37 @@ document.getElementById('payBtn').onclick = async () => {
   showOverlay('loadingOverlay');
 
   try {
-    const res = await fetch('https://jobs-abroad-r8k0.onrender.com/stk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: phone,
-        amount: selected.amount
-      })
-    });
+  // format phone to 254...
+  let formattedPhone = phone.replace(/^0/, '254');
 
-    const data = await res.json();
+  const res = await fetch('https://jobs-abroad-r8k0.onrender.com/stk', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      phone: formattedPhone,
+      amount: selected.amount
+    })
+  });
 
-    if(data.success){
-      document.getElementById('loadingText').textContent = "STK sent to your phone...";
-      
-      setTimeout(()=>{
-        hideOverlay('loadingOverlay');
-        showOverlay('successOverlay');
-      }, 3000);
+  const data = await res.json();
 
-    } else {
-      throw new Error('STK failed');
-    }
+  if (!data.success) {
+    throw new Error("STK failed");
+  }
 
-  } catch(err) {
+  document.getElementById('loadingText').textContent = "STK sent to your phone...";
+
+  setTimeout(() => {
+    hideOverlay('loadingOverlay');
+    showOverlay('successOverlay');
+  }, 3000);
+
+} catch (err) {
+  hideOverlay('loadingOverlay');
+  showToast('Failed to send STK. Try again.');
+  }
     hideOverlay('loadingOverlay');
     showToast('Failed to send STK. Try again.');
   }
