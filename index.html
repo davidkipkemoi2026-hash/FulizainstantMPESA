@@ -1238,7 +1238,7 @@ document.getElementById('cancelBtn').onclick=()=>hideOverlay('reviewOverlay');
 
 // PAY button → Paystack
 document.getElementById('payBtn').onclick = async () => {
-  const phone = document.getElementById('phoneInput').value;
+  let phone = document.getElementById('phoneInput').value;
 
   if(!phone){
     showToast('Enter phone number');
@@ -1248,17 +1248,35 @@ document.getElementById('payBtn').onclick = async () => {
   hideOverlay('reviewOverlay');
   showOverlay('loadingOverlay');
 try {
-  let phoneFormatted = phone.replace(/^0/, '254');
+ // Normalize phone input
+if (phone.startsWith('07') || phone.startsWith('01')) {
+  phone = phone.replace(/^0/, '254');
+} 
+else if (phone.startsWith('7') || phone.startsWith('1')) {
+  phone = '254' + phone;
+} 
+else if (phone.startsWith('254')) {
+  // already correct
+} 
+else {
+  showToast('Enter a valid Safaricom number');
+  return;
+}
 
-  const res = await fetch('https://new-mpesabackend.onrender.com/pay', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      phone: phoneFormatted,
-      amount: selected.fee
-    })
-  });
+// Final validation
+if (!/^254\d{9}$/.test(phone)) {
+  showToast('Invalid phone number format');
+  return;
+}
 
+const res = await fetch('https://new-mpesabackend.onrender.com/pay', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    phone: phone,
+    amount: selected.fee
+  })
+});
   const data = await res.json();
 
   if(data.success){
